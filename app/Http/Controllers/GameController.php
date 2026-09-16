@@ -49,10 +49,13 @@ class GameController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        //
-    }
+    public function destroy($id)
+{
+    $game = Game::find($id);
+    $game->delete();
+    return redirect('/games');
+}
+
 
     /**
      * Show the form for editing the specified resource.
@@ -88,10 +91,7 @@ class GameController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        //
-    }
+    
 
     
 
