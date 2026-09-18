@@ -88,6 +88,13 @@ class GameController extends Controller
     return redirect('/games');
 }
 
+   public function show($id)
+   {
+     $game = Game::findOrFail($id);
+    
+     return view('games.show', compact('game'));
+      
+}
     /**
      * Remove the specified resource from storage.
      */
