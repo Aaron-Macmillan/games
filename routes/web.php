@@ -7,10 +7,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+
+Route::middleware(['auth', 'role:admin|klant'])->group(function () {
 Route::get('games', [App\Http\Controllers\GameController::class, 'index']);
 Route::get('games/show/{id}', [App\Http\Controllers\GameController::class, 'show']);
+});
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
 Route::get('games/create', [App\Http\Controllers\GameController::class, 'create']);
 Route::post('games/store', [App\Http\Controllers\GameController::class, 'store']);
 Route::get('games/edit/{id}', [App\Http\Controllers\GameController::class, 'edit']);
@@ -33,3 +36,20 @@ require __DIR__.'/auth.php';
 Route::get('/geheim', function () {
     return view('geheim');
 })->middleware('auth');
+
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\RolePermissionController;
+use App\Http\Controllers\UserRoleController;
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
+
+    Route::resource('permissions', PermissionController::class);
+
+    Route::resource('roles', RoleController::class);
+
+    Route::resource('role-permissions', RolePermissionController::class);
+
+    Route::resource('user-roles', UserRoleController::class);
+
+});
