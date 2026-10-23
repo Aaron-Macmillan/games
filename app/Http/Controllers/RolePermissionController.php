@@ -3,62 +3,115 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class RolePermissionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $roles = Role::with('permissions')->get();
+
+        return view('role-permissions.index', compact('roles'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $roles = Role::all();
+        $permissions = Permission::all();
+
+        return view('role-permissions.create', compact(
+            'roles',
+            'permissions'
+        ));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'role_id' => 'required|exists:roles,id',
+            'permission_id' => 'required|exists:permissions,id',
+        ]);
+
+        $role = Role::findOrFail($request->role_id);
+        $permission = Permission::findOrFail($request->permission_id);
+
+        if ($role->hasPermissionTo($permission)) {
+            return back()
+                ->withErrors(['permission_id' => 'Deze koppeling bestaat al.'])
+                ->withInput();
+        }
+
+        $role->givePermissionTo($permission);
+
+        return redirect()->route('role-permissions.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit($role_id, $permission_id)
     {
-        //
+        $role = Role::findOrFail($role_id);
+        $permission = Permission::findOrFail($permission_id);
+
+        $roles = Role::all();
+        $permissions = Permission::all();
+
+        if (! $role->hasPermissionTo($permission)) {
+            abort(404);
+        }
+
+        return view('role-permissions.edit', compact(
+            'role',
+            'permission',
+            'roles',
+            'permissions'
+        ));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, $role_id, $permission_id)
     {
-        //
+        $request->validate([
+            'role_id' => 'required|exists:roles,id',
+            'permission_id' => 'required|exists:permissions,id',
+        ]);
+
+        $oldRole = Role::findOrFail($role_id);
+        $oldPermission = Permission::findOrFail($permission_id);
+
+        if (! $oldRole->hasPermissionTo($oldPermission)) {
+            abort(404);
+        }
+
+        $newRole = Role::findOrFail($request->role_id);
+        $newPermission = Permission::findOrFail($request->permission_id);
+
+        if (
+            ! ($oldRole->id == $newRole->id
+                && $oldPermission->id == $newPermission->id)
+            && $newRole->hasPermissionTo($newPermission)
+        ) {
+            return back()
+                ->withErrors(['permission_id' => 'Deze koppeling bestaat al.'])
+                ->withInput();
+        }
+
+        $oldRole->revokePermissionTo($oldPermission);
+        $newRole->givePermissionTo($newPermission);
+
+        return redirect()->route('role-permissions.index');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy($role_id, $permission_id)
     {
-        //
-    }
+        $role = Role::findOrFail($role_id);
+        $permission = Permission::findOrFail($permission_id);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        if (! $role->hasPermissionTo($permission)) {
+            abort(404);
+        }
+
+        $role->revokePermissionTo($permission);
+
+        return redirect()->route('role-permissions.index');
     }
 }
