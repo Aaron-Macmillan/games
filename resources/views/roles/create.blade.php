@@ -27,6 +27,10 @@
     <button type="submit" class="btn btn-success">
         Opslaan
     </button>
+
+    <a href="{{ route('roles.index') }}" class="btn btn-secondary">
+        Annuleren
+    </a>
 </form>
 
 @endsection

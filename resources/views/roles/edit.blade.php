@@ -33,6 +33,10 @@
     <button type="submit" class="btn btn-primary">
         Wijzigingen opslaan
     </button>
+
+    <a href="{{ route('roles.index') }}" class="btn btn-secondary">
+        Annuleren
+    </a>
 </form>
 
 @endsection

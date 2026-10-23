@@ -51,6 +51,10 @@
     <button type="submit" class="btn btn-success">
         Koppeling opslaan
     </button>
+
+    <a href="{{ route('role-permissions.index') }}" class="btn btn-secondary">
+        Annuleren
+    </a>
 </form>
 
 @endsection
