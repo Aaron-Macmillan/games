@@ -68,6 +68,24 @@ Route::delete('role-permissions/{role_id}/{permission_id}', [RolePermissionContr
     ->name('role-permissions.destroy');
 
 
-    Route::resource('user-roles', UserRoleController::class);
+    
+Route::get('user-roles', [UserRoleController::class, 'index'])
+    ->name('user-roles.index');
+
+Route::get('user-roles/create', [UserRoleController::class, 'create'])
+    ->name('user-roles.create');
+
+Route::post('user-roles', [UserRoleController::class, 'store'])
+    ->name('user-roles.store');
+
+Route::get('user-roles/{user_id}/{role_id}/edit', [UserRoleController::class, 'edit'])
+    ->name('user-roles.edit');
+
+Route::put('user-roles/{user_id}/{role_id}', [UserRoleController::class, 'update'])
+    ->name('user-roles.update');
+
+Route::delete('user-roles/{user_id}/{role_id}', [UserRoleController::class, 'destroy'])
+    ->name('user-roles.destroy');
+
 
 });
